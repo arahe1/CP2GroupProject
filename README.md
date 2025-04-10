@@ -8,10 +8,13 @@ Then git clone this page.
 If you don't have it setup already for some reason do the following:
 Conda Environment Setup
 
-conda create -n columnar_env;
-conda activate columnar_env;
-conda install jupyterlab;
-pip install awkward uproot;
+conda create -n columnar_env
+
+conda activate columnar_env
+
+conda install jupyterlab
+
+pip install awkward uproot
 
 Jupyter Lab Start
 
