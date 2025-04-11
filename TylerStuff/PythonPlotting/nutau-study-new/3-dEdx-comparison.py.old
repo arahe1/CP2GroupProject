@@ -1,0 +1,39 @@
+import uproot
+import awkward as ak
+import numpy as np
+import matplotlib.pyplot as plt
+
+file = uproot.open(
+    "/lstr/sahara/dune/tlabree/analysis/srcs/duneana/duneana/CERNWorkshop/Analysis/analysisOutput2.root"
+)
+tree = file["ana/tree"]
+data = tree.arrays(["trackResRange", "trackdEdx", "truePdgCodes"], library="ak")
+
+# Apply masks before flattening
+muon_mask = (data["truePdgCodes"] == 13) or (data["truePdgCodes"] == -13)
+pion_mask = (data["truePdgCodes"] == 211) or (data["truePdgCodes"] == -211)
+
+muon_resrange = data["trackResRange"][muon_mask]
+muon_dedx = data["trackdEdx"][muon_mask]
+
+pion_resrange = data["trackResRange"][pion_mask]
+pion_dedx = data["trackdEdx"][pion_mask]
+
+# Flatten the arrays after applying the masks
+flat_muon_resrange = ak.flatten(muon_resrange)
+flat_muon_dedx = ak.flatten(muon_dedx)
+flat_pion_resrange = ak.flatten(pion_resrange)
+flat_pion_dedx = ak.flatten(pion_dedx)
+
+plt.figure(figsize=(10, 6))
+
+plt.scatter(flat_muon_resrange, flat_muon_dedx, label="Muons", alpha=0.7)
+plt.scatter(flat_pion_resrange, flat_pion_dedx, label="Pions", alpha=0.7)
+
+plt.xlabel("Residual Range [cm]")
+plt.ylabel("dE/dx [MeV/cm]")
+plt.legend()
+plt.xlim(0, 130)
+plt.ylim(0, 15)
+plt.savefig("data/plots-new/dedx_vs_resrange_scatter.svg")
+

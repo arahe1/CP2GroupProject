@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N dEdx_comparison_mu_cc_run01
+#PBS -j oe
+#PBS -o ./jobs/run-01/logs/dEdx_comparison-mu_cc-output.log
+#PBS -e ./jobs/run-01/logs/dEdx_comparison-mu_cc-error.log
+#PBS -l select=1:ncpus=1:mem=32gb
+#PBS -l walltime=01:00:00
+
+# Change to the specified directory
+cd /lstr/sahara/dune/tlabree/nutau-study-new
+# Execute the script with the command
+"./batch-python.sh" '3-dEdx-comparison.py'

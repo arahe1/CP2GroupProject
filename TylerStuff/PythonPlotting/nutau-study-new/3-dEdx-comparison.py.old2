@@ -1,0 +1,65 @@
+import uproot
+import awkward as ak
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Open the ROOT file and get the data
+file = uproot.open("/lstr/sahara/dune/tlabree/analysis/srcs/duneana/duneana/CERNWorkshop/Analysis/analysisOutput2.root")
+tree = file["ana/tree"]
+data = tree.arrays(["trackResRange", "trackdEdx", "truePdgCodes"], library="ak")
+
+# Extract particle data based on PDG codes
+def extract_particle_data(data, pdg_values):
+    all_resrange = []
+    all_dedx = []
+    
+    for i in range(len(data)):
+        pdg_codes = data["truePdgCodes"][i]
+        
+        # Find matching tracks
+        track_indices = []
+        for j in range(len(pdg_codes)):
+            if pdg_codes[j] in pdg_values:
+                track_indices.append(j)
+        
+        # Process matching tracks
+        for idx in track_indices:
+            if idx < len(data["trackResRange"][i]) and idx < len(data["trackdEdx"][i]):
+                resrange = data["trackResRange"][i][idx]
+                dedx = data["trackdEdx"][i][idx]
+                
+                if len(resrange) > 0 and len(dedx) > 0:
+                    min_len = min(len(resrange), len(dedx))
+                    all_resrange.append(ak.to_numpy(resrange[:min_len]))
+                    all_dedx.append(ak.to_numpy(dedx[:min_len]))
+    
+    # Concatenate arrays
+    if all_resrange and all_dedx:
+        return np.concatenate(all_resrange), np.concatenate(all_dedx)
+    return np.array([]), np.array([])
+
+# Extract muon and pion data
+muon_resrange, muon_dedx = extract_particle_data(data, [13, -13])
+pion_resrange, pion_dedx = extract_particle_data(data, [211, -211])
+
+print(f"Extracted {len(muon_resrange)} muon points and {len(pion_resrange)} pion points")
+
+# Create scatter plot
+plt.figure(figsize=(10, 6))
+
+# Make scatter plot with smaller points for better visibility
+plt.scatter(muon_resrange, muon_dedx, s=1, alpha=0.6, label='Muons', color='blue')
+plt.scatter(pion_resrange, pion_dedx, s=1, alpha=0.6, label='Pions', color='red')
+
+# Style the plot
+plt.xlabel("Residual Range [cm]", fontsize=12)
+plt.ylabel("dE/dx [MeV/cm]", fontsize=12)
+plt.xlim(0, 130)
+plt.ylim(0, 15)
+plt.grid(True, alpha=0.3)
+plt.legend()
+
+# Save plot
+plt.savefig("data/plots-new/dedx_vs_resrange_scatter.png", dpi=300)
+
+print("✅ Plot saved successfully!")

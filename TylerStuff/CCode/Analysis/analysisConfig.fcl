@@ -1,0 +1,18 @@
+BEGIN_PROLOG
+
+analyseEvents:
+{
+    module_type: "AnalyseEvents"
+
+    MCTruthLabel: "generator"
+    MCParticleLabel: "largeant"
+    SliceLabel: "pandora"
+    PFParticleLabel: "pandora"
+    TrackLabel: "pandoraTrack"
+    CalorimetryLabel: "pandoracalo"
+    CVNLabel: "cvneva"
+    InitialNeutrinoFlavor: 14
+    IsChargedCurrent: 1
+}
+
+END_PROLOG
